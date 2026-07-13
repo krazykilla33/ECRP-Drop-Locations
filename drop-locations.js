@@ -229,8 +229,12 @@
 
   function updateOverlay(fit) {
     const config = mapConfigs[currentRegion];
-    const center = map.getCenter();
-    const zoom = map.getZoom();
+
+    // Leaflet throws if getCenter() is called before the first view is set.
+    const hasView = map._loaded === true;
+    const center = hasView ? map.getCenter() : null;
+    const zoom = hasView ? map.getZoom() : null;
+
     if (imageOverlay) map.removeLayer(imageOverlay);
 
     mapBounds = [[0, 0], [config.height, config.width]];
@@ -238,8 +242,11 @@
     imageOverlay.bringToBack();
     map.setMaxBounds([[-config.height * .2, -config.width * .2], [config.height * 1.2, config.width * 1.2]]);
 
-    if (fit || !Number.isFinite(zoom)) map.fitBounds(mapBounds, { animate: false });
-    else map.setView(center, zoom, { animate: false });
+    if (fit || !hasView) {
+      map.fitBounds(mapBounds, { animate: false });
+    } else {
+      map.setView(center, zoom, { animate: false });
+    }
   }
 
   function setFilter(filter) {
@@ -321,13 +328,7 @@
   }
 
   function escapeHtml(value) {
-    return String(value).replace(/[&<>'"]/g, char => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      "'": "&#39;",
-      '"': "&quot;"
-    })[char]);
+    return String(value).replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
   }
 
   els.sanAndreasBtn.addEventListener("click", () => setRegion("san-andreas"));
