@@ -3,7 +3,7 @@ window.DROP_LOCATIONS = [
     "id": "rons-wind-farm",
     "name": "Rons Wind Farm",
     "helper": "Inside the gated area on the west side of Wind Farm",
-	"image": "",
+	"image": "assets/drop-hints/rons-wind-farm.jpg",
     "region": "san-andreas",
     "map": {
       "satellite": {
@@ -20,7 +20,7 @@ window.DROP_LOCATIONS = [
     "id": "pipeline-inn",
     "name": "Pipeline Inn",
     "helper": "",
-	"image": "",
+	"image": "assets/drop-hints/pipeline-inn.png",
     "region": "san-andreas",
     "map": {
       "satellite": {
@@ -309,7 +309,7 @@ window.DROP_LOCATIONS = [
     "id": "sandy-shores-jetty",
     "name": "Sandy Shores Jetty",
     "helper": "At the end of the point.",
-	"image": "",
+	"image": "assets/drop-hints/sandy-shores-jetty.png",
     "region": "san-andreas",
     "map": {
       "satellite": {
@@ -615,7 +615,7 @@ window.DROP_LOCATIONS = [
     "id": "dutch-london-silos",
     "name": "Dutch London Silos",
     "helper": "Inside of the drive through labeled “2”",
-	"image": "",
+	"image": "assets/drop-hints/dutch-london-silos.jpg",
     "region": "san-andreas",
     "map": {
       "satellite": {
@@ -632,7 +632,7 @@ window.DROP_LOCATIONS = [
     "id": "vineyard",
     "name": "Vineyard",
     "helper": "Center of the Vineyard",
-	"image": "",
+	"image": "assets/drop-hints/vineyard.jpg",
     "region": "san-andreas",
     "map": {
       "satellite": {
@@ -649,7 +649,7 @@ window.DROP_LOCATIONS = [
     "id": "sandy-motel",
     "name": "Sandy Motel",
     "helper": "In the drained swimming pool",
-	"image": "",
+	"image": "assets/drop-hints/sandy-motel.jpg",
     "region": "san-andreas",
     "map": {
       "satellite": {
@@ -666,7 +666,7 @@ window.DROP_LOCATIONS = [
     "id": "alien-park",
     "name": "Alien Park",
     "helper": "",
-	"image": "",
+	"image": "assets/drop-hints/alien-park.jpg",
     "region": "san-andreas",
     "map": {
       "satellite": {
@@ -683,7 +683,7 @@ window.DROP_LOCATIONS = [
     "id": "alta-construction",
     "name": "Alta Construction",
     "helper": "Take the red elevator upstairs then head to the middle of the building",
-	"image": "",
+	"image": "assets/drop-hints/alta-construction.png",
     "region": "san-andreas",
     "map": {
       "satellite": {
@@ -700,7 +700,7 @@ window.DROP_LOCATIONS = [
     "id": "los-santos-river-2",
     "name": "Los Santos River 2",
     "helper": "",
-	"image": "",
+	"image": "assets/drop-hints/los-santos-river-2.png",
     "region": "san-andreas",
     "map": {
       "satellite": {
@@ -717,7 +717,7 @@ window.DROP_LOCATIONS = [
     "id": "los-santos-river-3",
     "name": "Los Santos River 3",
     "helper": "Under the bridge in Los Santos River. It is possible there is a second location for this one.",
-	"image": "",
+	"image": "assets/drop-hints/los-santos-river-3.png",
     "region": "san-andreas",
     "map": {
       "satellite": {
@@ -734,7 +734,7 @@ window.DROP_LOCATIONS = [
     "id": "cayo-drum",
     "name": "Cayo Drum",
     "helper": "On Cayo Perico near the red water tower",
-	"image": "",
+	"image": "assets/drop-hints/cayo-drum.jpg",
     "region": "cayo",
     "map": {
       "satellite": {
@@ -751,7 +751,7 @@ window.DROP_LOCATIONS = [
     "id": "elysian-freeway-bridge",
     "name": "Elysian Freeway Bridge",
     "helper": "Under the red bridge on the garbage side",
-	"image": "",
+	"image": "assets/drop-hints/elysian-freeway-bridge.jpg",
     "region": "san-andreas",
     "map": {
       "satellite": {
@@ -768,7 +768,7 @@ window.DROP_LOCATIONS = [
     "id": "del-perro-pier",
     "name": "Del Perro Pier",
     "helper": "Under the pier on the Vespucci Beach side",
-	"image": "",
+	"image": "assets/drop-hints/del-perro-pier.png",
     "region": "san-andreas",
     "map": {
       "satellite": {
@@ -785,7 +785,7 @@ window.DROP_LOCATIONS = [
     "id": "mirror-park-power-station",
     "name": "Mirror Park Power Station",
     "helper": "",
-	"image": "",
+	"image": "assets/drop-hints/mirror-park-power-station.png",
     "region": "san-andreas",
     "map": {
       "satellite": {
@@ -802,7 +802,7 @@ window.DROP_LOCATIONS = [
     "id": "redwood-lights-track",
     "name": "Redwood Lights Track",
     "helper": "Northwest side of the track",
-	"image": "",
+	"image": "assets/drop-hints/redwood-lights-track.jpg",
     "region": "san-andreas",
     "map": {
       "satellite": {
@@ -819,7 +819,7 @@ window.DROP_LOCATIONS = [
     "id": "galilee-pier",
     "name": "Galilee Pier",
     "helper": "Right lake, end of docks",
-	"image": "",
+	"image": "assets/drop-hints/galilee-pier.png",
     "region": "san-andreas",
     "map": {
       "satellite": {
@@ -836,7 +836,7 @@ window.DROP_LOCATIONS = [
     "id": "utopia-gardens",
     "name": "Utopia Gardens",
     "helper": "Broken-down houses in the back-right of the cul-de-sac",
-	"image": "",
+	"image": "assets/drop-hints/utopia-gardens.jpeg",
     "region": "san-andreas",
     "map": {
       "satellite": {
@@ -853,7 +853,7 @@ window.DROP_LOCATIONS = [
     "id": "vespucci-beach",
     "name": "Vespucci Beach",
     "helper": "In front of the rocks facing north",
-	"image": "",
+	"image": "assets/drop-hints/vespucci-beach.png",
     "region": "san-andreas",
     "map": {
       "satellite": {
