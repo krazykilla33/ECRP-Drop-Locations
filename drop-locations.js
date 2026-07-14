@@ -1,12 +1,30 @@
 (() => {
   "use strict";
 
-  const STORAGE_KEY = "ecrp-drop-location-coordinates-v1";
+  const STORAGE_KEY = "ecrp-drop-location-coordinates-v2";
   const sourceLocations = Array.isArray(window.DROP_LOCATIONS) ? window.DROP_LOCATIONS : [];
+  function normalizeStyleCoords(mapValue = {}) {
+    // Backward compatibility: old {x, y} data is treated as satellite data.
+    const legacySatellite = Number.isFinite(mapValue?.x) && Number.isFinite(mapValue?.y)
+      ? { x: mapValue.x, y: mapValue.y }
+      : { x: null, y: null };
+
+    return {
+      satellite: {
+        x: mapValue?.satellite?.x ?? legacySatellite.x,
+        y: mapValue?.satellite?.y ?? legacySatellite.y
+      },
+      atlas: {
+        x: mapValue?.atlas?.x ?? null,
+        y: mapValue?.atlas?.y ?? null
+      }
+    };
+  }
+
   const locations = sourceLocations.map(item => ({
     ...item,
     helper: item.helper || "",
-    map: { x: item.map?.x ?? null, y: item.map?.y ?? null }
+    map: normalizeStyleCoords(item.map)
   }));
 
   const mapConfigs = {
@@ -70,19 +88,27 @@
     resetLocalBtn: document.getElementById("resetLocalBtn")
   };
 
-  function isMapped(location) {
-    return Number.isFinite(location.map?.x) && Number.isFinite(location.map?.y);
+  function getCoords(location, style = currentStyle) {
+    return location?.map?.[style] || null;
+  }
+
+  function isMapped(location, style = currentStyle) {
+    const coords = getCoords(location, style);
+    return Number.isFinite(coords?.x) && Number.isFinite(coords?.y);
   }
 
   function loadSavedCoordinates() {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
       locations.forEach(location => {
-        const coords = saved[location.id];
-        if (coords && Number.isFinite(coords.x) && Number.isFinite(coords.y)) {
-          location.map.x = coords.x;
-          location.map.y = coords.y;
-        }
+        const savedMap = saved[location.id];
+        if (!savedMap) return;
+        ["satellite", "atlas"].forEach(style => {
+          const coords = savedMap[style];
+          if (coords && Number.isFinite(coords.x) && Number.isFinite(coords.y)) {
+            location.map[style] = { x: coords.x, y: coords.y };
+          }
+        });
       });
     } catch (error) {
       console.warn("Could not load saved drop-location coordinates.", error);
@@ -92,7 +118,14 @@
   function saveCoordinates() {
     const output = {};
     locations.forEach(location => {
-      if (isMapped(location)) output[location.id] = { x: location.map.x, y: location.map.y };
+      const savedMap = {};
+      ["satellite", "atlas"].forEach(style => {
+        if (isMapped(location, style)) {
+          const coords = getCoords(location, style);
+          savedMap[style] = { x: coords.x, y: coords.y };
+        }
+      });
+      if (Object.keys(savedMap).length) output[location.id] = savedMap;
     });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(output));
   }
@@ -125,7 +158,7 @@
     return `
       <div class="popup-name">${escapeHtml(location.name)}</div>
       ${location.helper ? `<div class="popup-helper">${escapeHtml(location.helper)}</div>` : ""}
-      ${editMode ? `<div class="popup-coords">X: ${location.map.x} &nbsp; Y: ${location.map.y}</div>` : ""}
+      ${editMode ? `<div class="popup-coords">${currentStyle.toUpperCase()} — X: ${getCoords(location)?.x} &nbsp; Y: ${getCoords(location)?.y}</div>` : ""}
     `;
   }
 
@@ -134,8 +167,9 @@
     markerMap.clear();
 
     getRegionLocations().forEach(location => {
+      const coords = getCoords(location);
       if (!isMapped(location)) return;
-      const marker = L.marker([location.map.y, location.map.x], {
+      const marker = L.marker([coords.y, coords.x], {
         icon: markerIcon(location.id === selectedId),
         keyboard: true,
         title: location.name
@@ -191,7 +225,8 @@
     const marker = markerMap.get(id);
     if (options.focus && isMapped(location)) {
       const targetZoom = Math.max(map.getZoom(), currentRegion === "cayo" ? 1 : 0.75);
-      map.flyTo([location.map.y, location.map.x], targetZoom, { duration: 0.65 });
+      const coords = getCoords(location);
+      map.flyTo([coords.y, coords.x], targetZoom, { duration: 0.65 });
     }
     if (options.popup && marker) setTimeout(() => marker.openPopup(), options.focus ? 650 : 0);
     if (options.scroll) document.getElementById(`drop-${id}`)?.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -205,7 +240,7 @@
     const location = locations.find(item => item.id === selectedId);
     els.placementBanner.classList.remove("hidden");
     els.placementBanner.textContent = location
-      ? `Click the map to ${isMapped(location) ? "move" : "place"} “${location.name}”.`
+      ? `Click the ${currentStyle} map to ${isMapped(location) ? "move" : "place"} “${location.name}”.`
       : "Select a location from the list, then click the map to place its marker.";
   }
 
@@ -225,6 +260,7 @@
     els.satelliteBtn.classList.toggle("active", style === "satellite");
     els.atlasBtn.classList.toggle("active", style === "atlas");
     updateOverlay(false);
+    renderAll();
   }
 
   function updateOverlay(fit) {
@@ -275,15 +311,23 @@
 
     const x = Math.round(Math.min(config.width, Math.max(0, latlng.lng)));
     const y = Math.round(Math.min(config.height, Math.max(0, latlng.lat)));
-    location.map.x = x;
-    location.map.y = y;
+    location.map[currentStyle] = { x, y };
     saveCoordinates();
     renderAll();
     selectLocation(location.id, { focus: false, scroll: true, popup: true });
   }
 
   function makeDataFile() {
-    const plain = locations.map(({ id, name, helper, region, map: coords }) => ({ id, name, helper, region, map: coords }));
+    const plain = locations.map(({ id, name, helper, region, map }) => ({
+      id,
+      name,
+      helper,
+      region,
+      map: {
+        satellite: { x: map.satellite.x, y: map.satellite.y },
+        atlas: { x: map.atlas.x, y: map.atlas.y }
+      }
+    }));
     return `window.DROP_LOCATIONS = ${JSON.stringify(plain, null, 2)};\n`;
   }
 
@@ -314,8 +358,7 @@
     if (!confirm("Clear all marker coordinates saved in this browser? This does not change your original JS file.")) return;
     localStorage.removeItem(STORAGE_KEY);
     locations.forEach((location, index) => {
-      location.map.x = sourceLocations[index]?.map?.x ?? null;
-      location.map.y = sourceLocations[index]?.map?.y ?? null;
+      location.map = normalizeStyleCoords(sourceLocations[index]?.map);
     });
     selectedId = null;
     renderAll();
