@@ -73,10 +73,19 @@ h1 { margin: 0; font-size: 25px; line-height: 1.1; letter-spacing: -.02em; }
 .empty-state { padding: 30px 20px; color: #77869a; text-align: center; font-size: 13px; }
 .hidden { display: none !important; }
 
-.drop-marker-wrap { background: transparent; border: 0; }
-.drop-marker { position: relative; width: 22px; height: 22px; border: 3px solid #fff; border-radius: 50% 50% 50% 0; background: var(--accent); transform: rotate(-45deg); box-shadow: 0 5px 14px rgba(0,0,0,.65), 0 0 0 4px rgba(49,214,199,.15); }
-.drop-marker::after { content: ""; position: absolute; left: 5px; top: 5px; width: 6px; height: 6px; border-radius: 50%; background: #082321; }
-.drop-marker.selected { background: var(--warn); box-shadow: 0 5px 15px rgba(0,0,0,.7), 0 0 0 7px rgba(242,184,75,.19); }
+.drop-marker-wrap {
+  background: transparent !important;
+  border: 0 !important;
+}
+
+.drop-marker-svg {
+  display: block;
+  overflow: visible;
+  pointer-events: none;
+  filter:
+    drop-shadow(0 4px 5px rgba(0, 0, 0, 0.75))
+    drop-shadow(0 0 5px rgba(49, 214, 199, 0.35));
+}
 
 .leaflet-control-zoom a { color: #eaf0f7 !important; background: rgba(10,16,25,.9) !important; border-color: rgba(255,255,255,.09) !important; }
 .leaflet-control-zoom a:hover { background: #182434 !important; }
