@@ -83,9 +83,10 @@
       .location-hint-image {
         display: block;
         width: 100%;
-        max-height: 220px;
+        height: 150px;
         margin-top: 10px;
         object-fit: cover;
+        object-position: center;
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 9px;
         background: #080d14;
@@ -96,10 +97,11 @@
       .popup-hint-image {
         display: block;
         width: 260px;
+        height: 150px;
         max-width: 100%;
-        max-height: 190px;
         margin-top: 9px;
         object-fit: cover;
+        object-position: center;
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 8px;
         background: #080d14;
