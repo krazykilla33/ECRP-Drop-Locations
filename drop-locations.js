@@ -394,7 +394,7 @@ createHintImageUi();
       }).addTo(markerLayer);
 
       marker.bindPopup(popupHtml(location), { closeButton: true, autoPanPadding: [40, 80] });
-      marker.on("click", () => selectLocation(location.id, { focus: false, scroll: true, popup: true }));
+      marker.on("click", () => selectLocation(location.id, { focus: true, scroll: true, popup: true }));
       markerMap.set(location.id, marker);
     });
   }
