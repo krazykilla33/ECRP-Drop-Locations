@@ -2,6 +2,7 @@
   "use strict";
 
   const STORAGE_KEY = "ecrp-drop-location-coordinates-v2";
+  const EDIT_PASSCODE = "2468";
   const sourceLocations = Array.isArray(window.DROP_LOCATIONS) ? window.DROP_LOCATIONS : [];
   function normalizeStyleCoords(mapValue = {}) {
     // Backward compatibility: old {x, y} data is treated as satellite data.
@@ -538,11 +539,44 @@ createHintImageUi();
   }
 
   function toggleEditMode() {
+    if (!editMode) {
+      const enteredPasscode = prompt("Enter the editor passcode:");
+
+      if (enteredPasscode === null) {
+        return;
+      }
+
+      if (enteredPasscode !== EDIT_PASSCODE) {
+        alert("Incorrect passcode.");
+        return;
+      }
+    }
+
     editMode = !editMode;
-    els.editModeBtn.setAttribute("aria-pressed", String(editMode));
-    els.editModeBtn.textContent = editMode ? "Done" : "Edit";
-    els.editorPanel.classList.toggle("hidden", !editMode);
-    map.getContainer().style.cursor = editMode ? "crosshair" : "grab";
+
+    document.body.classList.toggle(
+      "admin-edit-mode",
+      editMode
+    );
+
+    els.editModeBtn.setAttribute(
+      "aria-pressed",
+      String(editMode)
+    );
+
+    els.editModeBtn.textContent = editMode
+      ? "Done"
+      : "Edit";
+
+    els.editorPanel.classList.toggle(
+      "hidden",
+      !editMode
+    );
+
+    map.getContainer().style.cursor = editMode
+      ? "crosshair"
+      : "grab";
+
     renderAll();
   }
 
