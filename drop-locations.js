@@ -274,7 +274,14 @@ createHintImageUi();
   }
 
   function getRegionLocations() {
-    return locations.filter(location => location.region === currentRegion);
+    return locations
+      .filter(location => location.region === currentRegion)
+      .sort((a, b) =>
+        a.name.localeCompare(b.name, undefined, {
+          sensitivity: "base",
+          numeric: true
+        })
+      );
   }
 
   function getVisibleLocations() {
