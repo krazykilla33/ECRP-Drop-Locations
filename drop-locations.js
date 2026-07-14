@@ -24,6 +24,7 @@
   const locations = sourceLocations.map(item => ({
     ...item,
     helper: item.helper || "",
+    image: item.image || "",
     map: normalizeStyleCoords(item.map)
   }));
 
@@ -67,6 +68,143 @@
   });
   markerLayer.addTo(map);
 
+  function createHintImageUi() {
+  if (!document.getElementById("dropHintImageStyles")) {
+    const style = document.createElement("style");
+
+    style.id = "dropHintImageStyles";
+
+    style.textContent = `
+      .location-card-content {
+        display: block;
+        min-width: 0;
+      }
+
+      .location-hint-image {
+        display: block;
+        width: 100%;
+        max-height: 220px;
+        margin-top: 10px;
+        object-fit: cover;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 9px;
+        background: #080d14;
+        cursor: zoom-in;
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.3);
+      }
+
+      .popup-hint-image {
+        display: block;
+        width: 260px;
+        max-width: 100%;
+        max-height: 190px;
+        margin-top: 9px;
+        object-fit: cover;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        background: #080d14;
+        cursor: zoom-in;
+      }
+
+      .image-lightbox {
+        position: fixed;
+        inset: 0;
+        z-index: 5000;
+        display: grid;
+        place-items: center;
+        padding: 38px;
+        background: rgba(0, 0, 0, 0.92);
+        backdrop-filter: blur(7px);
+      }
+
+      .image-lightbox.hidden {
+        display: none !important;
+      }
+
+      .lightbox-image {
+        display: block;
+        max-width: min(92vw, 1500px);
+        max-height: 90vh;
+        object-fit: contain;
+        border-radius: 4px;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.8);
+      }
+
+      .lightbox-close {
+        position: fixed;
+        z-index: 5001;
+        top: 16px;
+        right: 18px;
+        display: grid;
+        place-items: center;
+        width: 42px;
+        height: 42px;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: rgba(20, 25, 34, 0.88);
+        color: #ffffff;
+        font-size: 30px;
+        line-height: 1;
+        cursor: pointer;
+      }
+
+      .lightbox-close:hover {
+        background: rgba(49, 214, 199, 0.22);
+      }
+
+      body.lightbox-open {
+        overflow: hidden;
+      }
+
+      @media (max-width: 700px) {
+        .image-lightbox {
+          padding: 52px 12px 12px;
+        }
+
+        .lightbox-image {
+          max-width: 96vw;
+          max-height: 86vh;
+        }
+      }
+    `;
+
+    document.head.appendChild(style);
+  }
+
+  if (!document.getElementById("imageLightbox")) {
+    const lightbox = document.createElement("div");
+
+    lightbox.id = "imageLightbox";
+    lightbox.className = "image-lightbox hidden";
+    lightbox.setAttribute("role", "dialog");
+    lightbox.setAttribute("aria-modal", "true");
+    lightbox.setAttribute("aria-label", "Location hint image");
+
+    lightbox.innerHTML = `
+      <button
+        id="closeLightboxBtn"
+        class="lightbox-close"
+        type="button"
+        aria-label="Close image"
+      >
+        ×
+      </button>
+
+      <img
+        id="lightboxImage"
+        class="lightbox-image"
+        src=""
+        alt=""
+      />
+    `;
+
+    document.body.appendChild(lightbox);
+  }
+}
+
+createHintImageUi();
+
   const els = {
     sanAndreasBtn: document.getElementById("sanAndreasBtn"),
     cayoBtn: document.getElementById("cayoBtn"),
@@ -85,7 +223,10 @@
     placementBanner: document.getElementById("placementBanner"),
     copyDataBtn: document.getElementById("copyDataBtn"),
     downloadDataBtn: document.getElementById("downloadDataBtn"),
-    resetLocalBtn: document.getElementById("resetLocalBtn")
+    resetLocalBtn: document.getElementById("resetLocalBtn"),
+    imageLightbox: document.getElementById("imageLightbox"),
+    lightboxImage: document.getElementById("lightboxImage"),
+    closeLightboxBtn: document.getElementById("closeLightboxBtn")
   };
 
   function getCoords(location, style = currentStyle) {
@@ -182,11 +323,51 @@
    });
  }
 
+  function hintImageHtml(src, location, className) {
+    return `
+      <img
+        class="${className}"
+        src="${escapeHtml(src)}"
+        alt="Hint for ${escapeHtml(location.name)}"
+        loading="lazy"
+        data-lightbox-image="${escapeHtml(src)}"
+        data-lightbox-alt="Hint for ${escapeHtml(location.name)}"
+      />
+    `;
+  }
+  
   function popupHtml(location) {
+    const coords = getCoords(location);
+
     return `
       <div class="popup-name">${escapeHtml(location.name)}</div>
-      ${location.helper ? `<div class="popup-helper">${escapeHtml(location.helper)}</div>` : ""}
-      ${editMode ? `<div class="popup-coords">${currentStyle.toUpperCase()} — X: ${getCoords(location)?.x} &nbsp; Y: ${getCoords(location)?.y}</div>` : ""}
+
+      ${
+        location.helper
+          ? `<div class="popup-helper">${escapeHtml(location.helper)}</div>`
+          : ""
+      }
+
+      ${
+        location.image
+          ? hintImageHtml(
+              location.image,
+              location,
+              "popup-hint-image"
+            )
+          : ""
+      }
+
+      ${
+        editMode && coords
+          ? `
+            <div class="popup-coords">
+              ${currentStyle.toUpperCase()}
+              — X: ${coords.x} &nbsp; Y: ${coords.y}
+            </div>
+          `
+          : ""
+      }
     `;
   }
 
@@ -223,11 +404,36 @@
       card.className = `location-card${mapped ? " mapped" : ""}${location.id === selectedId ? " active" : ""}`;
       card.innerHTML = `
         <span class="pin" aria-hidden="true">⌖</span>
-        <span>
-          <span class="location-name">${escapeHtml(location.name)}</span>
-          ${location.helper ? `<span class="location-helper">${escapeHtml(location.helper)}</span>` : ""}
+
+        <span class="location-card-content">
+          <span class="location-name">
+            ${escapeHtml(location.name)}
+          </span>
+
+          ${
+            location.helper
+              ? `
+                <span class="location-helper">
+                  ${escapeHtml(location.helper)}
+                </span>
+              `
+              : ""
+          }
+
+          ${
+            location.image && location.id === selectedId
+              ? hintImageHtml(
+                  location.image,
+                  location,
+                  "location-hint-image"
+                )
+              : ""
+          }
         </span>
-        <span class="location-state">${mapped ? "MAPPED" : "UNMAPPED"}</span>
+
+        <span class="location-state">
+          ${mapped ? "MAPPED" : "UNMAPPED"}
+        </span>
       `;
       card.addEventListener("click", () => selectLocation(location.id, { focus: mapped, scroll: false, popup: mapped }));
       els.dropList.appendChild(card);
@@ -346,17 +552,38 @@
   }
 
   function makeDataFile() {
-    const plain = locations.map(({ id, name, helper, region, map }) => ({
-      id,
-      name,
-      helper,
-      region,
-      map: {
-        satellite: { x: map.satellite.x, y: map.satellite.y },
-        atlas: { x: map.atlas.x, y: map.atlas.y }
-      }
-    }));
-    return `window.DROP_LOCATIONS = ${JSON.stringify(plain, null, 2)};\n`;
+    const plain = locations.map(
+      ({
+        id,
+        name,
+        helper,
+        image,
+        region,
+        map
+      }) => ({
+        id,
+        name,
+        helper,
+        image: image || "",
+        region,
+        map: {
+          satellite: {
+            x: map.satellite.x,
+            y: map.satellite.y
+          },
+          atlas: {
+            x: map.atlas.x,
+            y: map.atlas.y
+          }
+        }
+      })
+    );
+
+    return (
+      "window.DROP_LOCATIONS = " +
+      JSON.stringify(plain, null, 2) +
+      ";\n"
+    );
   }
 
   async function copyData() {
@@ -402,6 +629,25 @@
     return String(value).replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
   }
 
+  function openLightbox(src, alt = "") {
+    if (!src) return;
+
+    els.lightboxImage.src = src;
+    els.lightboxImage.alt = alt;
+
+    els.imageLightbox.classList.remove("hidden");
+    document.body.classList.add("lightbox-open");
+  }
+
+  function closeLightbox() {
+    els.imageLightbox.classList.add("hidden");
+
+    els.lightboxImage.src = "";
+    els.lightboxImage.alt = "";
+
+    document.body.classList.remove("lightbox-open");
+  }
+  
   els.sanAndreasBtn.addEventListener("click", () => setRegion("san-andreas"));
   els.cayoBtn.addEventListener("click", () => setRegion("cayo"));
   els.satelliteBtn.addEventListener("click", () => setStyle("satellite"));
@@ -424,6 +670,42 @@
     renderList();
   });
   map.on("click", event => placeSelected(event.latlng));
+
+  document.addEventListener("click", event => {
+    const image = event.target.closest?.(
+      "[data-lightbox-image]"
+    );
+
+    if (!image) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    openLightbox(
+      image.dataset.lightboxImage,
+      image.dataset.lightboxAlt || ""
+    );
+  });
+
+  els.closeLightboxBtn.addEventListener("click", event => {
+    event.stopPropagation();
+    closeLightbox();
+  });
+
+  els.imageLightbox.addEventListener("click", event => {
+    if (event.target === els.imageLightbox) {
+      closeLightbox();
+    }
+  });
+
+  document.addEventListener("keydown", event => {
+    if (
+      event.key === "Escape" &&
+      !els.imageLightbox.classList.contains("hidden")
+    ) {
+      closeLightbox();
+    }
+  });
 
   loadSavedCoordinates();
   updateOverlay(true);
