@@ -46,7 +46,7 @@ h1 { margin: 0; font-size: 25px; line-height: 1.1; letter-spacing: -.02em; }
 .clear-search { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 28px; height: 28px; border: 0; border-radius: 8px; background: transparent; color: #95a3b5; font-size: 20px; cursor: pointer; }
 .clear-search:hover { background: rgba(255,255,255,.06); color: #fff; }
 
-.toolbar { display: flex; align-items: center; gap: 6px; padding: 0 20px 12px; border-bottom: 1px solid var(--line); }
+.toolbar { display: none; align-items: center; gap: 6px; padding: 0 20px 12px; border-bottom: 1px solid var(--line); }
 .filter { border: 1px solid transparent; border-radius: 8px; padding: 6px 9px; background: transparent; color: #8391a4; font-size: 11px; font-weight: 800; cursor: pointer; }
 .filter:hover { color: #fff; }
 .filter.active { border-color: rgba(49,214,199,.2); background: rgba(49,214,199,.11); color: var(--accent); }
@@ -61,14 +61,14 @@ h1 { margin: 0; font-size: 25px; line-height: 1.1; letter-spacing: -.02em; }
 .editor-actions .danger { grid-column: 1 / -1; border-color: rgba(239,100,100,.25); background: rgba(239,100,100,.08); color: #ffb8b8; }
 
 .location-list { flex: 1; overflow-y: auto; padding: 9px 10px 22px; scrollbar-width: thin; scrollbar-color: #263345 transparent; }
-.location-card { position: relative; display: grid; grid-template-columns: 30px minmax(0,1fr) auto; gap: 10px; align-items: start; width: 100%; margin: 3px 0; padding: 12px 10px; border: 1px solid transparent; border-radius: 11px; background: transparent; color: inherit; text-align: left; cursor: pointer; }
+.location-card { position: relative; display: grid; grid-template-columns: 30px minmax(0,1fr); gap: 10px; align-items: start; width: 100%; margin: 3px 0; padding: 12px 10px; border: 1px solid transparent; border-radius: 11px; background: transparent; color: inherit; text-align: left; cursor: pointer; }
 .location-card:hover { background: rgba(255,255,255,.035); border-color: rgba(255,255,255,.05); }
 .location-card.active { border-color: rgba(49,214,199,.32); background: linear-gradient(90deg, rgba(49,214,199,.13), rgba(49,214,199,.035)); box-shadow: inset 3px 0 0 var(--accent); }
 .pin { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 9px; background: #182332; color: #718399; font-size: 14px; }
 .location-card.mapped .pin { color: var(--accent); background: rgba(49,214,199,.11); }
 .location-name { display: block; padding-top: 1px; color: #eaf0f7; font-size: 13px; font-weight: 800; line-height: 1.25; }
 .location-helper { display: block; margin-top: 4px; color: #7f8da0; font-size: 11px; line-height: 1.38; }
-.location-state { padding-top: 3px; color: #526174; font-size: 9px; font-weight: 900; letter-spacing: .08em; }
+.location-state { display: none; padding-top: 3px; color: #526174; font-size: 9px; font-weight: 900; letter-spacing: .08em; }
 .location-card.mapped .location-state { color: #52c9be; }
 .empty-state { padding: 30px 20px; color: #77869a; text-align: center; font-size: 13px; }
 .hidden { display: none !important; }
@@ -186,6 +186,22 @@ h1 { margin: 0; font-size: 25px; line-height: 1.1; letter-spacing: -.02em; }
 
 body.lightbox-open {
   overflow: hidden;
+}
+
+/* ========================================
+   ADMIN / EDIT MODE
+======================================== */
+
+body.admin-edit-mode .toolbar {
+  display: flex;
+}
+
+body.admin-edit-mode .location-state {
+  display: block;
+}
+
+body.admin-edit-mode .location-card {
+  grid-template-columns: 30px minmax(0,1fr) auto;
 }
 
 @media (max-width: 860px) {
