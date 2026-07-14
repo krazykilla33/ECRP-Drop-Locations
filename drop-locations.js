@@ -145,14 +145,42 @@
   }
 
   function markerIcon(selected = false) {
-    return L.divIcon({
-      className: "drop-marker-wrap",
-      html: `<div class="drop-marker${selected ? " selected" : ""}"></div>`,
-      iconSize: [28, 32],
-      iconAnchor: [13, 30],
-      popupAnchor: [1, -28]
-    });
-  }
+   const fill = selected ? "#f2b84b" : "#31d6c7";
+
+   return L.divIcon({
+     className: "drop-marker-wrap",
+     html: `
+       <svg
+         class="drop-marker-svg"
+         width="28"
+         height="36"
+         viewBox="0 0 28 36"
+         aria-hidden="true"
+       >
+         <path
+           d="M14 1
+              C6.8 1 1 6.8 1 14
+              C1 23.2 14 35 14 35
+              C14 35 27 23.2 27 14
+              C27 6.8 21.2 1 14 1Z"
+           fill="${fill}"
+           stroke="#ffffff"
+           stroke-width="2.5"
+         />
+
+         <circle
+           cx="14"
+           cy="14"
+           r="5"
+           fill="#082321"
+         />
+       </svg>
+     `,
+     iconSize: [28, 36],
+     iconAnchor: [14, 35],
+     popupAnchor: [0, -34]
+   });
+ }
 
   function popupHtml(location) {
     return `
